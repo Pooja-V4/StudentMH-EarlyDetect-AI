@@ -1,0 +1,29 @@
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.animate-slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+.login-card {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.card-dashboard {
+    animation: slideIn 0.5s ease-out;
+}
+
+.welcome-header {
+    animation: fadeIn 0.8s ease-out;
+}

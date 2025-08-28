@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";  // change if needed
 $pass = "";      // your MySQL password
-$dbname = "college_portal";
+$dbname = "college_portal111";
 
 $conn = new mysqli($host, $user, $pass, $dbname);
 if ($conn->connect_error) {

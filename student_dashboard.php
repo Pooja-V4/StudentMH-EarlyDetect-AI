@@ -44,6 +44,9 @@ $student = $result->fetch_assoc();
                     <a href="#" class="list-group-item list-group-item-action bg-transparent text-white border-0 active">
                         <i class="fas fa-home me-2"></i> Dashboard
                     </a>
+                    <a href="study_plan.php" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                        <i class="fas fa-book-open me-2"></i> Studyplanner
+                    </a>
                     <a href="login.php" class="list-group-item list-group-item-action bg-transparent text-white border-0">
                         <i class="fas fa-sign-out-alt me-2"></i> Logout
                     </a>

@@ -190,6 +190,127 @@ h1, h2, h3, h4, h5, h6 {
     vertical-align: middle;
 }
 
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+        
+.header {
+    background: linear-gradient(120deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+       
+.content {
+    padding: 30px;
+}
+     
+.card-custom {
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border: none;
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+}
+        
+.card-custom:hover {
+    transform: translateY(-5px);
+}
+        
+.risk-high {
+    color: var(--danger);
+    font-weight: bold;
+}
+       
+.risk-medium {
+    color: var(--warning);
+    font-weight: bold;
+}
+       
+.risk-low {
+    color: var(--success);
+    font-weight: bold;
+}
+      
+.study-plan {
+    background-color: #f8f9fc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+        
+.study-day {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+      
+.subject-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+        
+.progress {
+    height: 10px;
+    margin-bottom: 10px;
+}
+       
+.btn-generate {
+    background: linear-gradient(120deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+      
+.btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(78, 115, 223, 0.4);
+}
+        
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+      
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+}
+        
+.ai-recommendation {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+      
+.subject-input-group {
+margin-bottom: 10px;
+}
+        
+.subject-color {
+    width: 40px;
+    height: 38px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+    
+
+
 /* Responsive */
 @media (max-width: 768px) {
     .sidebar {

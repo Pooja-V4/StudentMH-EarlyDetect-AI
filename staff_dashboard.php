@@ -10,8 +10,27 @@ if ($_SESSION['role'] !== 'staff') {
 $staff_name = $_SESSION['staff_name'];
 $department = $_SESSION['department'];
 
+$sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+
 // Get student data
 $sql = "SELECT * FROM students WHERE staff_name=?";
+if ($sort == 'risk_high') {
+    $sql .= " ORDER BY 
+        CASE risk_level 
+            WHEN 'High' THEN 1 
+            WHEN 'Moderate' THEN 2 
+            WHEN 'Low' THEN 3 
+            ELSE 4 
+        END";
+} elseif ($sort == 'risk_low') {
+    $sql .= " ORDER BY 
+        CASE risk_level 
+            WHEN 'Low' THEN 1 
+            WHEN 'Moderate' THEN 2 
+            WHEN 'High' THEN 3 
+            ELSE 4 
+        END";
+}
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $staff_name);
 $stmt->execute();
@@ -20,6 +39,8 @@ $result = $stmt->get_result();
 // Calculate stats for the dashboard
 $total_students = $result->num_rows;
 $high_risk_count = 0;
+$moderate_risk_count = 0;
+$low_risk_count = 0;
 $avg_marks = 0;
 $avg_attendance = 0;
 
@@ -32,6 +53,10 @@ if ($total_students > 0) {
         $attendance_sum += $row['attendance'];
         if ($row['risk_level'] == 'High') {
             $high_risk_count++;
+        } elseif ($row['risk_level'] == 'Moderate') {
+            $moderate_risk_count++;
+        } else {
+            $low_risk_count++;
         }
     }
     
@@ -140,11 +165,13 @@ if ($total_students > 0) {
                 </div>
             </div>
             
-            <div class="card card-dashboard">
-                <div class="card-header">
-                    <h5 class="mb-0">Your Students</h5>
-                </div>
-                <div class="card-body">
+            <div class="card-body">
+                    <div class="risk-summary">
+                        <span class="risk-badge badge-high"><i class="fas fa-exclamation-circle me-1"></i> High Risk: <?php echo $high_risk_count; ?></span>
+                        <span class="risk-badge badge-moderate"><i class="fas fa-info-circle me-1"></i> Moderate Risk: <?php echo $moderate_risk_count; ?></span>
+                        <span class="risk-badge badge-low"><i class="fas fa-check-circle me-1"></i> Low Risk: <?php echo $low_risk_count; ?></span>
+                    </div>
+                    
                     <?php if ($result->num_rows > 0): ?>
                     <div class="table-responsive">
                         <table class="table table-hover">
@@ -162,8 +189,8 @@ if ($total_students > 0) {
                                     $risk_class = '';
                                     if ($row['risk_level'] == 'High') {
                                         $risk_class = 'risk-high';
-                                    } elseif ($row['risk_level'] == 'Medium') {
-                                        $risk_class = 'risk-medium';
+                                    } elseif ($row['risk_level'] == 'Moderate') {
+                                        $risk_class = 'risk-moderate';
                                     } else {
                                         $risk_class = 'risk-low';
                                     }
@@ -173,7 +200,16 @@ if ($total_students > 0) {
                                     <td><?php echo $row['student_name']; ?></td>
                                     <td><?php echo $row['marks']; ?></td>
                                     <td><?php echo $row['attendance']; ?>%</td>
-                                    <td class="<?php echo $risk_class; ?>"><?php echo $row['risk_level']; ?></td>
+                                    <td class="<?php echo $risk_class; ?>">
+                                        <i class="fas 
+                                            <?php 
+                                            if ($row['risk_level'] == 'High') echo 'fa-exclamation-circle';
+                                            elseif ($row['risk_level'] == 'Moderate') echo 'fa-info-circle';
+                                            else echo 'fa-check-circle';
+                                            ?> 
+                                            me-1"></i>
+                                        <?php echo $row['risk_level']; ?>
+                                    </td>
                                 </tr>
                                 <?php endwhile; ?>
                             </tbody>

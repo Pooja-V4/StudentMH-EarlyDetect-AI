@@ -163,7 +163,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 }
 
-.risk-medium {
+.risk-medium, .risk-medium {
     color: var(--warning);
     font-weight: bold;
 }
@@ -220,21 +220,6 @@ h1, h2, h3, h4, h5, h6 {
         
 .card-custom:hover {
     transform: translateY(-5px);
-}
-        
-.risk-high {
-    color: var(--danger);
-    font-weight: bold;
-}
-       
-.risk-medium {
-    color: var(--warning);
-    font-weight: bold;
-}
-       
-.risk-low {
-    color: var(--success);
-    font-weight: bold;
 }
       
 .study-plan {
@@ -309,7 +294,45 @@ margin-bottom: 10px;
     border: 1px solid #ced4da;
 }
     
+/* Sorting and risk badges */
+.sort-dropdown {
+    display: inline-block;
+    margin-left: 15px;
+}
 
+.sort-active {
+    background-color: #f8f9fa;
+    font-weight: 500;
+}
+
+.risk-summary {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.risk-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-high {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.badge-moderate {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-low {
+    background-color: #d4edda;
+    color: #155724;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

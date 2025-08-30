@@ -2,16 +2,16 @@ import pandas as pd
 import mysql.connector
 from mysql.connector import Error
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import IsolationForest
-from sklearn.cluster import KMeans
+from sklearn.ensemble import IsolationForest, RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+import numpy as np
 
-# Mysql Connection
 def create_db_connection():
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            database='college_portal111',
+            database='college_portal11',
             user='root',  
             password=''   
         )
@@ -95,6 +95,7 @@ def insert_student_data(df):
         
         # Clear existing data 
         cursor.execute("DELETE FROM students")
+        cursor.execute("ALTER TABLE students AUTO_INCREMENT = 1")
         
         # Insert new data
         for _, row in df.iterrows():
@@ -155,6 +156,7 @@ def insert_staff_data_from_excel():
         
         # Clear existing data 
         cursor.execute("DELETE FROM staff")
+        cursor.execute("ALTER TABLE staff AUTO_INCREMENT = 1")
         print("🧹 Cleared existing staff data")
         
         # Insert new data
@@ -186,6 +188,63 @@ def insert_staff_data_from_excel():
         if connection.is_connected():
             cursor.close()
             connection.close()
+
+def create_synthetic_training_data():
+    
+    """Create synthetic training data with clear risk level patterns"""
+    
+    np.random.seed(42) 
+    n_samples = 1000
+    data = []
+    
+    # Low risk: High marks AND high attendance
+    n_low = n_samples // 3
+    for _ in range(n_low):
+        marks = np.random.normal(85, 5)  # High marks
+        attendance = np.random.normal(85, 5)  # High attendance
+        data.append([marks, attendance, 'Low'])
+    
+    # Moderate risk: Medium marks OR medium attendance
+    n_moderate = n_samples // 3
+    for _ in range(n_moderate):
+        if np.random.random() > 0.5:
+            marks = np.random.normal(65, 5)  # Medium marks
+            attendance = np.random.normal(75, 5)  # High attendance
+        else:
+            marks = np.random.normal(80, 5)  # High marks
+            attendance = np.random.normal(70, 5)  # Medium attendance
+        data.append([marks, attendance, 'Moderate'])
+    
+    # High risk: Low marks OR low attendance
+    n_high = n_samples // 3
+    for _ in range(n_high):
+        marks = np.random.normal(45, 10)  # Low marks
+        attendance = np.random.normal(55, 10)  # Low attendance
+        data.append([marks, attendance, 'High'])
+
+    df = pd.DataFrame(data, columns=['Marks', 'Attendance', 'Risk_Level'])
+    df['Marks'] = df['Marks'].clip(0, 100)
+    df['Attendance'] = df['Attendance'].clip(0, 100)
+    
+    return df
+
+def train_risk_classifier():
+    
+    """Train a machine learning classifier to predict risk levels"""
+    
+    train_df = create_synthetic_training_data()
+    X = train_df[['Marks', 'Attendance']]
+    y = train_df['Risk_Level']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Train Random Forest classifier
+    clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    print("📊 Model Evaluation:")
+    print(classification_report(y_test, y_pred))
+    
+    return clf
 
 def process_student_data():
     
@@ -220,25 +279,14 @@ def process_student_data():
     outlier_labels = iso.fit_predict(df[['Marks', 'Attendance']])
     df = df[outlier_labels == 1]   
     print(f"📊 After outlier removal: {len(df)} students")
-
-    # Scale data
-    scaler = StandardScaler()
-    scaled_features = scaler.fit_transform(df[['Marks', 'Attendance']])
-
-    # ---------------- Risk Prediction ----------------
     
-    print("🔮 Predicting risk levels...")
-    kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
-    df['Cluster'] = kmeans.fit_predict(scaled_features)
-
-    cluster_means = df.groupby('Cluster')[['Marks', 'Attendance']].mean()
-    risk_mapping = {
-        cluster_means.sort_values(by=['Marks', 'Attendance']).index[0]: 'High',
-        cluster_means.sort_values(by=['Marks', 'Attendance']).index[1]: 'Moderate',
-        cluster_means.sort_values(by=['Marks', 'Attendance']).index[2]: 'Low'
-    }
-    df['Risk_Level'] = df['Cluster'].map(risk_mapping)
-
+    # ---------------- Risk Prediction ----------------
+    print("🔮 Training ML model and predicting risk levels...")
+    
+    clf = train_risk_classifier()
+    X = df[['Marks', 'Attendance']]
+    df['Risk_Level'] = clf.predict(X)
+    
     """
     #Count risk levels
     
@@ -246,10 +294,15 @@ def process_student_data():
     print("📈 Risk Level Distribution:")
     for level, count in risk_counts.items():
         print(f"   {level}: {count} students")
+    
+        
+    print("\n👁️  Sample risk assessments for verification:")
+    sample_size = min(5, len(df))
+    for i in range(sample_size):
+        student = df.iloc[i]
+        print(f"   {student['Student_Name']}: Marks={student['Marks']:.1f}, Attendance={student['Attendance']:.1f} → {student['Risk_Level']} risk")
     """
-
-    # Saving the risk prediction result in a separate file
-    output_df = df.drop(columns=['Cluster'])
+    output_df = df.copy()
     output_df.to_excel("student_risk_output.xlsx", index=False)
     print("✅ Cleaned data with predicted risk levels saved to student_risk_output.xlsx")
     

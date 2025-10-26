@@ -156,7 +156,7 @@ def insert_staff_data_from_excel():
         
         # Clear existing data 
         cursor.execute("DELETE FROM staff")
-        cursor.execute("ALTER TABLE staff AUTO_INCREMENT = 1")
+        #cursor.execute("ALTER TABLE staff AUTO_INCREMENT = 1")
         print("🧹 Cleared existing staff data")
         
         # Insert new data
